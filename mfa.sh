@@ -1,20 +1,31 @@
 #!/bin/bash
 
 # check/install oauth
-brew list oath-toolkit  ||  echo installing oath-toolkit 
+if brew list oath-toolkit > /dev/null ; then
+    echo -e "oath-toolkit already intalled"
+else
+    echo -e installing oath-toolkit 
+    brew list oath-toolkit
+fi
 
-echo oath-toolkit installed 
+echo -e'service example: aws (the command you will use on terminal to get totp will be aws-mfa-code)'
+read -p 'Service: ' servicemfa
 
-echo 'Which service are you configuring? ex: aws (the command you will use on terminal to get totp will be aws-mfa-code)'
-read servicemfa
-
-echo Insert seed
-read -s seedmfa
+read -sp 'Seed:' seedmfa
 
 
 #create secret with MFA seed in keychain 
-echo Adding $servicemfa to keychain...
+echo -e "Adding $servicemfa to keychain..."
 security add-generic-password -s $servicemfa'-mfa-seed'  -a $servicemfa+'-seed' -w $seedmfa 
-echo Stored $servicemfa-mfa-seed in keychain...
+echo -e "Stored $servicemfa-mfa-seed in keychain..."
 
-echo "alias $servicemfa-mfa-code='oathtool -b --totp \$(security find-generic-password -w  -s $servicemfa -a $servicemfa)" >>  ~/.zshrc
+echo "Run the command according to you terminal
+
+zsh:
+
+"
+echo "  echo alias $servicemfa-mfa-code=\"oathtool -b --totp  \$(security find-generic-password -w  -s $servicemfa -a $servicemfa)\" >>  ~/.zshrc"
+
+echo "bash: "
+
+echo "  echo alias $servicemfa-mfa-code=\"oathtool -b --totp  \$(security find-generic-password -w  -s $servicemfa -a $servicemfa)\" >>  ~/.bashrc"
